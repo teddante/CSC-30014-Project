@@ -789,6 +789,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2022548065}
   - component: {fileID: 2022548066}
+  - component: {fileID: 2022548067}
   m_Layer: 0
   m_Name: CarRoot
   m_TagString: Untagged
@@ -829,3 +830,28 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &2022548067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2022548064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b786677e529eaaa4f82acd6348d65bcf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TorqueCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  Gears: []
+  WheelTorque: 0
+  EngineTorque: 0
+  CurrentGear: 0
+  FinalDifferential: 0
+  RPM: 0
+  Throttle: 0
