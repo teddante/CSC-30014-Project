@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 public class Car : MonoBehaviour
@@ -16,6 +18,8 @@ public class Car : MonoBehaviour
     public float Throttle;
     public WheelCollider RL;
     public WheelCollider RR;
+    public float Speed;
+    public float ZTSTimer;
 
     // Start is called before the first frame update
     void Start()
@@ -23,8 +27,6 @@ public class Car : MonoBehaviour
         //Set up engine
         SetTorqueCurve();
         SetupGearBox();
-
-        CurrentGear = 0;
     }
 
     public void SetupGearBox()
@@ -38,9 +40,13 @@ public class Car : MonoBehaviour
         Gears.Add(0.814f); //5th
     }
 
+    /// <summary>
+    /// Sets up torque curve lookup
+    /// </summary>
     public void SetTorqueCurve()
     {
         TorqueCurve.AddKey(0, 0);
+        TorqueCurve.AddKey(1000, 65);
         TorqueCurve.AddKey(5500, 135);
         TorqueCurve.AddKey(7250, 0);
     }
@@ -50,10 +56,38 @@ public class Car : MonoBehaviour
     {
         RPM = ((RL.rpm + RR.rpm) / 2) * Gears[CurrentGear] * FinalDifferential;
 
+        RPM = Mathf.Clamp(RPM, 1000, 7250);
+
         Throttle = Mathf.Clamp(Throttle, 0, 1);
 
-        EngineTorque = Mathf.Clamp(TorqueCurve.Evaluate(RPM), 1000, 7250);
+        EngineTorque = TorqueCurve.Evaluate(RPM);
 
         WheelTorque = EngineTorque * Gears[CurrentGear] * FinalDifferential * Throttle;
+
+        RL.motorTorque = WheelTorque / 2;
+        RR.motorTorque = WheelTorque / 2;
+
+        CurrentGear = OptimumGear();
+
+        Speed = GetComponent<Rigidbody>().velocity.magnitude * 2.23694f;
+
+        if (Speed < 62)
+        {
+            ZTSTimer += Time.deltaTime;
+        }
+    }
+
+    public int OptimumGear()
+    {
+        List<float> testGearTorqueFloats = new List<float>();
+
+        for (var gearIndex = 0; gearIndex < Gears.Count; gearIndex++)
+        {
+            float testRPM = Mathf.Clamp(((RL.rpm + RR.rpm) / 2) * Gears[gearIndex] * FinalDifferential, 1000, 7250);
+            float testEngineTorque = TorqueCurve.Evaluate(testRPM);
+            testGearTorqueFloats.Add(testEngineTorque * Gears[gearIndex] * FinalDifferential * Throttle);
+        }
+
+        return testGearTorqueFloats.IndexOf(testGearTorqueFloats.Max());
     }
 }

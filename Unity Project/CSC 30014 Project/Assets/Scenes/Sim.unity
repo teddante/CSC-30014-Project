@@ -773,7 +773,7 @@ Transform:
   m_GameObject: {fileID: 1434228848}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 10000, y: 1, z: 10000}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -805,7 +805,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2022548064}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0.809, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -823,7 +823,7 @@ Rigidbody:
   m_GameObject: {fileID: 2022548064}
   serializedVersion: 2
   m_Mass: 950
-  m_Drag: 0.38
+  m_Drag: 0
   m_AngularDrag: 0
   m_UseGravity: 1
   m_IsKinematic: 0
@@ -851,7 +851,11 @@ MonoBehaviour:
   Gears: []
   WheelTorque: 0
   EngineTorque: 0
-  CurrentGear: 0
-  FinalDifferential: 0
+  CurrentGear: 2
+  FinalDifferential: 4.1
   RPM: 0
-  Throttle: 0
+  Throttle: 1
+  RL: {fileID: 561673642}
+  RR: {fileID: 1377685658}
+  Speed: 0
+  ZTSTimer: 0
