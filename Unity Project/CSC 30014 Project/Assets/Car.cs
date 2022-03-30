@@ -124,4 +124,12 @@ public class Car : Agent
     {
 
     }
+
+    //The Heuristic function allows to manually control the actions of the agent to test it by hand before handing it over the ML AI
+    public override void Heuristic(in ActionBuffers actionsOut)
+    {
+        var continuousActionsOut = actionsOut.ContinuousActions;
+        continuousActionsOut[0] = Input.GetAxis("Horizontal");
+        continuousActionsOut[1] = Input.GetAxis("Vertical");
+    }
 }
