@@ -2,24 +2,34 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.MLAgents;
+using Unity.MLAgents.Sensors;
+using Unity.MLAgents.Actuators;
 using UnityEditor;
 using UnityEngine;
 
-public class Car : MonoBehaviour
+public class Car : Agent
 {
     public AnimationCurve TorqueCurve;
 
+    //Inputs
+    public float Steering;
+    public float Throttle;
+    public float Brake;
+
+    //Other
     public List<float> Gears = new(); //Index 0 and 1 are reserverd for reverse and neutral, index 1 must = 0;
     public float WheelTorque;
     public float EngineTorque;
     public int CurrentGear;
     public float FinalDifferential;
     public float RPM;
-    public float Throttle;
     public WheelCollider RL;
     public WheelCollider RR;
     public float Speed;
     public float ZTSTimer;
+    public float FrontBrakePeakNM;
+    public float RearBrakePeakNM;
 
     // Start is called before the first frame update
     void Start()
@@ -27,6 +37,11 @@ public class Car : MonoBehaviour
         //Set up engine
         SetTorqueCurve();
         SetupGearBox();
+
+        //Set Brakes
+        //1400nm is the peak Brake force for the Mazda
+        FrontBrakePeakNM = 1400 * 0.67f;
+        RearBrakePeakNM = 1400 * (1 - 0.67f);
     }
 
     public void SetupGearBox()
@@ -38,6 +53,8 @@ public class Car : MonoBehaviour
         Gears.Add(1.33f); //3rd
         Gears.Add(1f); //4th
         Gears.Add(0.814f); //5th
+
+        FinalDifferential = 4.1f;
     }
 
     /// <summary>
@@ -89,5 +106,22 @@ public class Car : MonoBehaviour
         }
 
         return testGearTorqueFloats.IndexOf(testGearTorqueFloats.Max());
+    }
+
+
+    //AI
+    public override void OnEpisodeBegin()
+    {
+
+    }
+
+    public override void CollectObservations(VectorSensor sensor)
+    {
+
+    }
+
+    public override void OnActionReceived(ActionBuffers actionBuffers)
+    {
+
     }
 }
