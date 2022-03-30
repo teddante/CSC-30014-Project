@@ -1,17 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MLAgents;
-using KartGame.KartSystems;
-using MLAgents.CommunicatorObjects;
-using KartGame.Track;
+using Unity.MLAgents;
 
-public class KartAgent : Agent, IInput
+public class KartAgent : Agent
 {
-
-    TrackManager trackManager;
-    IRacer racer;
-    KartMovement kart;
     public LayerMask raycastLayers;
     public float debugRaycastTime = 2f;
     public float raycastDistance = 10;
@@ -93,6 +86,4 @@ public class KartAgent : Agent, IInput
         }
         Debug.DrawRay(ray.position, ray.forward * distance, Color.Lerp(Color.red, Color.green, obs), Time.deltaTime * debugRaycastTime);
     }
-
-
 }
