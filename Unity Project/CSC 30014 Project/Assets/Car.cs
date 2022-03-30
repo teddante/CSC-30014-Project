@@ -30,10 +30,14 @@ public class Car : Agent
     public float ZTSTimer;
     public float FrontBrakePeakNM;
     public float RearBrakePeakNM;
+    
+    private Rigidbody rBody;
 
     // Start is called before the first frame update
     void Start()
     {
+        rBody = GetComponent<Rigidbody>();
+
         //Set up engine
         SetTorqueCurve();
         SetupGearBox();
@@ -112,7 +116,9 @@ public class Car : Agent
     //AI
     public override void OnEpisodeBegin()
     {
-
+        rBody.angularVelocity = Vector3.zero;
+        rBody.velocity = Vector3.zero;
+        transform.localPosition = new Vector3(0, 01, 0);
     }
 
     public override void CollectObservations(VectorSensor sensor)
