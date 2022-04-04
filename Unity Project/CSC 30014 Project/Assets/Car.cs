@@ -73,7 +73,7 @@ public class Car : Agent
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         RPM = ((RL.rpm + RR.rpm) / 2) * Gears[CurrentGear] * FinalDifferential;
 
@@ -118,12 +118,15 @@ public class Car : Agent
     {
         rBody.angularVelocity = Vector3.zero;
         rBody.velocity = Vector3.zero;
-        transform.localPosition = new Vector3(0, 01, 0);
+        transform.localPosition = new Vector3(0,1,0);
+        transform.localEulerAngles = Vector3.zero;
     }
 
+    //Feed info into AI
     public override void CollectObservations(VectorSensor sensor)
     {
-
+        sensor.AddObservation(rBody.velocity);
+        sensor.AddObservation(rBody.angularVelocity);
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)

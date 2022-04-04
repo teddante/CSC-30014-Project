@@ -18977,23 +18977,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b786677e529eaaa4f82acd6348d65bcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 0
   TorqueCurve:
     serializedVersion: 2
     m_Curve: []
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  Steering: 0
+  Throttle: 1
+  Brake: 0
   Gears: []
   WheelTorque: 0
   EngineTorque: 0
   CurrentGear: 2
   FinalDifferential: 4.1
   RPM: 0
-  Throttle: 1
   RL: {fileID: 561673642}
   RR: {fileID: 1377685658}
   Speed: 0
   ZTSTimer: 0
+  FrontBrakePeakNM: 0
+  RearBrakePeakNM: 0
 --- !u!114 &2022548068
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19010,7 +19018,7 @@ MonoBehaviour:
   m_DetectableTags: []
   m_RaysPerDirection: 8
   m_MaxRayDegrees: 180
-  m_SphereCastRadius: 0.5
+  m_SphereCastRadius: 0
   m_RayLength: 100
   m_RayLayerMask:
     serializedVersion: 2
@@ -19036,16 +19044,16 @@ MonoBehaviour:
     VectorObservationSize: 1
     NumStackedVectorObservations: 1
     m_ActionSpec:
-      m_NumContinuousActions: 0
-      BranchSizes: 01000000
-    VectorActionSize: 01000000
+      m_NumContinuousActions: 2
+      BranchSizes: 
+    VectorActionSize: 02000000
     VectorActionDescriptions: []
-    VectorActionSpaceType: 0
+    VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
   m_BehaviorType: 0
-  m_BehaviorName: My Behavior
+  m_BehaviorName: Car
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
