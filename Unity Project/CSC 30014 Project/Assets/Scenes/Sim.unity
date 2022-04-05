@@ -154,7 +154,7 @@ Transform:
   - {fileID: 2022548065}
   - {fileID: 684453010}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3238907
 GameObject:
@@ -5398,13 +5398,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 499936831}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_Father: {fileID: 2022548065}
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &507818260
 GameObject:
@@ -10522,7 +10522,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &1041032835
 GameObject:
@@ -13492,7 +13492,7 @@ Transform:
   m_GameObject: {fileID: 1357470988}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 0.5, z: 3}
+  m_LocalScale: {x: 1.4, y: 0.5, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2022548065}
@@ -18925,6 +18925,7 @@ GameObject:
   - component: {fileID: 2022548067}
   - component: {fileID: 2022548069}
   - component: {fileID: 2022548068}
+  - component: {fileID: 2022548070}
   m_Layer: 0
   m_Name: CarRoot
   m_TagString: Untagged
@@ -18946,6 +18947,7 @@ Transform:
   m_Children:
   - {fileID: 1357470989}
   - {fileID: 460617425}
+  - {fileID: 499936834}
   m_Father: {fileID: 2725995}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -18996,6 +18998,8 @@ MonoBehaviour:
   CurrentGear: 2
   FinalDifferential: 4.1
   RPM: 0
+  FL: {fileID: 141353393}
+  FR: {fileID: 157493381}
   RL: {fileID: 561673642}
   RR: {fileID: 1377685658}
   Speed: 0
@@ -19041,7 +19045,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 1
+    VectorObservationSize: 10
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 2
@@ -19051,13 +19055,27 @@ MonoBehaviour:
     VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 0}
-  m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_InferenceDevice: 3
+  m_BehaviorType: 1
   m_BehaviorName: Car
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
   m_ObservableAttributeHandling: 0
+--- !u!114 &2022548070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2022548064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DecisionPeriod: 5
+  TakeActionsBetweenDecisions: 1
 --- !u!1 &2032711595
 GameObject:
   m_ObjectHideFlags: 0

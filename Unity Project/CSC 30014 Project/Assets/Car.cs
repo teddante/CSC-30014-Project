@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Mathematics;
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
@@ -24,8 +25,12 @@ public class Car : Agent
     public int CurrentGear;
     public float FinalDifferential;
     public float RPM;
+
+    public WheelCollider FL;
+    public WheelCollider FR;
     public WheelCollider RL;
     public WheelCollider RR;
+
     public float Speed;
     public float ZTSTimer;
     public float FrontBrakePeakNM;
@@ -85,11 +90,24 @@ public class Car : Agent
 
         WheelTorque = EngineTorque * Gears[CurrentGear] * FinalDifferential * Throttle;
 
+        CurrentGear = OptimumGear();
+
+        FL.steerAngle = Steering * 30;
+        FR.steerAngle = Steering * 30;
+
         RL.motorTorque = WheelTorque / 2;
         RR.motorTorque = WheelTorque / 2;
 
-        CurrentGear = OptimumGear();
+        FL.brakeTorque = FrontBrakePeakNM * Brake;
+        FR.brakeTorque = FrontBrakePeakNM * Brake;
+        RL.brakeTorque = RearBrakePeakNM * Brake;
+        RR.brakeTorque = RearBrakePeakNM * Brake;
 
+        TestingThings();
+    }
+
+    private void TestingThings()
+    {
         Speed = GetComponent<Rigidbody>().velocity.magnitude * 2.23694f;
 
         if (Speed < 62)
@@ -125,12 +143,18 @@ public class Car : Agent
     //Feed info into AI
     public override void CollectObservations(VectorSensor sensor)
     {
+        sensor.AddObservation(transform.rotation);
         sensor.AddObservation(rBody.velocity);
         sensor.AddObservation(rBody.angularVelocity);
     }
 
+    //Apply AI inputs and rewards
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
+        Steering = Mathf.Clamp(actionBuffers.ContinuousActions[0], -1, 1);
+
+        Throttle = Mathf.Clamp(actionBuffers.ContinuousActions[1], 0 ,1);
+        Brake = -Mathf.Clamp(actionBuffers.ContinuousActions[1], -1, 0);
 
     }
 
