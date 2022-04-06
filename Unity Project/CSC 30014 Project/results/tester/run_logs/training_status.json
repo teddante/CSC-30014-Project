@@ -18,15 +18,24 @@
                 "auxillary_file_paths": [
                     "results\\tester\\Car\\Car-75517.pt"
                 ]
+            },
+            {
+                "steps": 98029,
+                "file_path": "results\\tester\\Car\\Car-98029.onnx",
+                "reward": null,
+                "creation_time": 1649287746.2652462,
+                "auxillary_file_paths": [
+                    "results\\tester\\Car\\Car-98029.pt"
+                ]
             }
         ],
         "final_checkpoint": {
-            "steps": 75517,
+            "steps": 98029,
             "file_path": "results\\tester\\Car.onnx",
             "reward": null,
-            "creation_time": 1649287286.9446876,
+            "creation_time": 1649287746.2652462,
             "auxillary_file_paths": [
-                "results\\tester\\Car\\Car-75517.pt"
+                "results\\tester\\Car\\Car-98029.pt"
             ]
         }
     },

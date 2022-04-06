@@ -113,6 +113,8 @@ public class Car : Agent
 
         if (ZeroSpeedTimer <= 0)
         {
+            SetReward(-1f);
+
             EndEpisode();
         }
 
@@ -192,7 +194,7 @@ public class Car : Agent
     {
         if (collision.gameObject.name == "Wall")
         {
-            AddReward(-1);
+            SetReward(-1f);
 
             EndEpisode();
         }
