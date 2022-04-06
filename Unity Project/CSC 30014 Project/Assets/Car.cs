@@ -37,6 +37,7 @@ public class Car : Agent
     public float RearBrakePeakNM;
     
     private Rigidbody rBody;
+    private float ZeroSpeedTimer;
 
     // Start is called before the first frame update
     void Start()
@@ -51,6 +52,8 @@ public class Car : Agent
         //1400nm is the peak Brake force for the Mazda
         FrontBrakePeakNM = 1400 * 0.67f;
         RearBrakePeakNM = 1400 * (1 - 0.67f);
+
+        ZeroSpeedTimer = 5;
     }
 
     public void SetupGearBox()
@@ -103,6 +106,16 @@ public class Car : Agent
         RL.brakeTorque = RearBrakePeakNM * Brake;
         RR.brakeTorque = RearBrakePeakNM * Brake;
 
+        if (rBody.velocity.magnitude < 1)
+        {
+            ZeroSpeedTimer -= Time.fixedDeltaTime;
+        }
+
+        if (ZeroSpeedTimer <= 0)
+        {
+            EndEpisode();
+        }
+
         TestingThings();
     }
 
@@ -142,8 +155,10 @@ public class Car : Agent
         rBody.angularVelocity = Vector3.zero;
         rBody.velocity = Vector3.zero;
 
-        transform.localPosition = new Vector3(0,1,0);
+        transform.localPosition = new Vector3(0, 0.6f, 0);
         transform.localEulerAngles = Vector3.zero;
+
+        ZeroSpeedTimer = 5;
     }
 
     //Feed info into AI
@@ -177,7 +192,7 @@ public class Car : Agent
     {
         if (collision.gameObject.name == "Wall")
         {
-            SetReward(-1);
+            AddReward(-1);
 
             EndEpisode();
         }
