@@ -136,12 +136,12 @@ public class Car : Agent
         return testGearTorqueFloats.IndexOf(testGearTorqueFloats.Max());
     }
 
-
     //AI
     public override void OnEpisodeBegin()
     {
         rBody.angularVelocity = Vector3.zero;
         rBody.velocity = Vector3.zero;
+
         transform.localPosition = new Vector3(0,1,0);
         transform.localEulerAngles = Vector3.zero;
     }
@@ -162,6 +162,7 @@ public class Car : Agent
         Throttle = Mathf.Clamp(actionBuffers.ContinuousActions[1], 0 ,1);
         Brake = -Mathf.Clamp(actionBuffers.ContinuousActions[1], -1, 0);
 
+        AddReward(0.001f * rBody.velocity.magnitude);
     }
 
     //The Heuristic function allows to manually control the actions of the agent to test it by hand before handing it over the ML AI
@@ -170,5 +171,15 @@ public class Car : Agent
         var continuousActionsOut = actionsOut.ContinuousActions;
         continuousActionsOut[0] = Input.GetAxis("Horizontal");
         continuousActionsOut[1] = Input.GetAxis("Vertical");
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.name == "Wall")
+        {
+            SetReward(-1);
+
+            EndEpisode();
+        }
     }
 }
