@@ -116,6 +116,12 @@ public class Car : Agent
         }
     }
 
+    /// <summary>
+    /// Finds the optimum gear to use based on the cars current speed conditions
+    ///
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public int OptimumGear()
     {
         List<float> testGearTorqueFloats = new List<float>();
