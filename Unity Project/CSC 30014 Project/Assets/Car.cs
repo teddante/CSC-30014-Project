@@ -11,6 +11,10 @@ using UnityEngine;
 
 public class Car : Agent
 {
+    //Track
+    public List<GameObject> TrackPieces = new List<GameObject>();
+    public List<GameObject> Checkpoints = new List<GameObject>();
+    public int UpcomingCheckpoint;
 
     //Inputs
     public float Steering;
@@ -152,21 +156,44 @@ public class Car : Agent
     //AI
     public override void OnEpisodeBegin()
     {
+        foreach (var trackPiece in TrackPieces)
+        {
+            Destroy(trackPiece);
+        }
+
+        GenerateTrack();
+
         rBody.angularVelocity = Vector3.zero;
         rBody.velocity = Vector3.zero;
 
-        transform.localPosition = new Vector3(0, 0.6f, 0);
+        transform.localPosition = new Vector3(0, 0.6f, 0); //Height of car from top to bottom of tyre with fully extended suspension
         transform.localEulerAngles = Vector3.zero;
 
         ZeroSpeedTimer = 5;
     }
 
-    //Feed info into AI
+    public void GenerateTrack()
+    {
+        throw new NotImplementedException();
+    }
+
+    //Feed info/obsevations into AI
     public override void CollectObservations(VectorSensor sensor)
     {
+        sensor.AddObservation(transform.position);
         sensor.AddObservation(transform.rotation);
+
         sensor.AddObservation(rBody.velocity);
         sensor.AddObservation(rBody.angularVelocity);
+
+        sensor.AddObservation(Checkpoints[UpcomingCheckpoint].transform.position);
+        sensor.AddObservation(Checkpoints[UpcomingCheckpoint].transform.rotation);
+        sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 1].transform.position);
+        sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 1].transform.rotation);
+        sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 2].transform.position);
+        sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 2].transform.rotation);
+        sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 3].transform.position);
+        sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 3].transform.rotation);
     }
 
     //Apply AI inputs and rewards
