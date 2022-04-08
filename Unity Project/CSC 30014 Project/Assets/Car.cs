@@ -11,14 +11,14 @@ using UnityEngine;
 
 public class Car : Agent
 {
-    public AnimationCurve TorqueCurve;
 
     //Inputs
     public float Steering;
     public float Throttle;
     public float Brake;
 
-    //Other
+    //Car Stuff
+    public AnimationCurve TorqueCurve;
     public List<float> Gears = new(); //Index 0 and 1 are reserverd for reverse and neutral, index 1 must = 0;
     public float WheelTorque;
     public float EngineTorque;
@@ -40,7 +40,7 @@ public class Car : Agent
     private float ZeroSpeedTimer;
 
     // Start is called before the first frame update
-    void Start()
+    public override void Initialize()
     {
         rBody = GetComponent<Rigidbody>();
 
@@ -133,8 +133,6 @@ public class Car : Agent
 
     /// <summary>
     /// Finds the optimum gear to use based on the cars current speed conditions
-    ///
-    /// 
     /// </summary>
     /// <returns></returns>
     public int OptimumGear()
