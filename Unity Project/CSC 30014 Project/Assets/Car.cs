@@ -174,7 +174,6 @@ public class Car : Agent
 
     public void GenerateTrack()
     {
-        throw new NotImplementedException();
     }
 
     //Feed info/obsevations into AI
@@ -186,6 +185,8 @@ public class Car : Agent
         sensor.AddObservation(rBody.velocity);
         sensor.AddObservation(rBody.angularVelocity);
 
+        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 1).transform.position);
+
         sensor.AddObservation(Checkpoints[UpcomingCheckpoint].transform.position);
         sensor.AddObservation(Checkpoints[UpcomingCheckpoint].transform.rotation);
         sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 1].transform.position);
@@ -194,6 +195,28 @@ public class Car : Agent
         sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 2].transform.rotation);
         sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 3].transform.position);
         sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 3].transform.rotation);
+    }
+
+    public GameObject FindCheckpointAfter(int upcomingCheckpoint, int addAmount)
+    {
+        int i = upcomingCheckpoint;
+
+        int j = addAmount;
+
+        int k = Checkpoints.Count - 1;
+
+        while (j > 0)
+        {
+            i++;
+            j--;
+
+            if (i == k)
+            {
+                i = 0;
+            }
+        }
+
+        return Checkpoints[i];
     }
 
     //Apply AI inputs and rewards
