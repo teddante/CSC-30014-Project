@@ -23,7 +23,7 @@ public class Car : Agent
 
     //Car Stuff
     public AnimationCurve TorqueCurve;
-    public List<float> Gears = new(); //Index 0 and 1 are reserverd for reverse and neutral, index 1 must = 0;
+    public List<float> Gears = new(); //Index 0 and 1 are reserverd for reverse and neutral, index 1 must = 0 for neutral;
     public float WheelTorque;
     public float EngineTorque;
     public int CurrentGear;
@@ -185,16 +185,14 @@ public class Car : Agent
         sensor.AddObservation(rBody.velocity);
         sensor.AddObservation(rBody.angularVelocity);
 
+        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 0).transform.position);
+        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 0).transform.rotation);
         sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 1).transform.position);
-
-        sensor.AddObservation(Checkpoints[UpcomingCheckpoint].transform.position);
-        sensor.AddObservation(Checkpoints[UpcomingCheckpoint].transform.rotation);
-        sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 1].transform.position);
-        sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 1].transform.rotation);
-        sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 2].transform.position);
-        sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 2].transform.rotation);
-        sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 3].transform.position);
-        sensor.AddObservation(Checkpoints[UpcomingCheckpoint + 3].transform.rotation);
+        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 1).transform.rotation);
+        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 2).transform.position);
+        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 2).transform.rotation);
+        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 3).transform.position);
+        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 3).transform.rotation);
     }
 
     public GameObject FindCheckpointAfter(int upcomingCheckpoint, int addAmount)
