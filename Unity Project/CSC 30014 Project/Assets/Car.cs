@@ -244,5 +244,10 @@ public class Car : Agent
 
             EndEpisode();
         }
+
+        if (collision.gameObject.tag == "Checkpoint")
+        {
+            UpcomingCheckpoint == 
+        }
     }
 }
