@@ -858,8 +858,16 @@ PrefabInstance:
       value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 3008877256022777461, guid: d7b09581a04f9dd49b03f5f6277fa1ed, type: 3}
+      propertyPath: m_EndVerticalOffset
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3008877256022777461, guid: d7b09581a04f9dd49b03f5f6277fa1ed, type: 3}
       propertyPath: m_RayLayerMask.m_Bits
       value: 53
+      objectReference: {fileID: 0}
+    - target: {fileID: 3008877256022777461, guid: d7b09581a04f9dd49b03f5f6277fa1ed, type: 3}
+      propertyPath: m_StartVerticalOffset
+      value: 0.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
