@@ -166,11 +166,13 @@ public class Car : Agent
         transform.localPosition = new Vector3(0, 0.6f, 0); //Height of car from top to bottom of tyre with fully extended suspension
         transform.localEulerAngles = Vector3.zero;
 
-        ZeroSpeedTimer = 5;
+        ZeroSpeedTimer = 2;
     }
 
     public void FindCheckpointsFromTrackPieces()
     {
+        Checkpoints.Clear();
+
         foreach (var trackPiece in TrackPieces)
         {
             var allKids = GetComponentsInChildren<Transform>();
@@ -263,7 +265,7 @@ public class Car : Agent
         continuousActionsOut[1] = Input.GetAxis("Vertical");
     }
 
-    void OnCollisionEnter(Collision collision)
+    public void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.name == "Wall")
         {
@@ -271,7 +273,10 @@ public class Car : Agent
 
             EndEpisode();
         }
+    }
 
+    public void OnTriggerEnter(Collider collision)
+    {
         if (collision.gameObject.tag == "Checkpoint")
         {
             AddReward(1);
