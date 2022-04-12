@@ -156,12 +156,9 @@ public class Car : Agent
     //AI
     public override void OnEpisodeBegin()
     {
-        foreach (var trackPiece in TrackPieces)
-        {
-            Destroy(trackPiece);
-        }
+        //GenerateTrack();
 
-        GenerateTrack();
+        FindCheckpointsFromTrackPieces();
 
         rBody.angularVelocity = Vector3.zero;
         rBody.velocity = Vector3.zero;
@@ -172,8 +169,38 @@ public class Car : Agent
         ZeroSpeedTimer = 5;
     }
 
+    public void FindCheckpointsFromTrackPieces()
+    {
+        foreach (var trackPiece in TrackPieces)
+        {
+            var allKids = GetComponentsInChildren<Transform>();
+
+            Transform[] ts = trackPiece.transform.GetComponentsInChildren<Transform>();
+
+            foreach (Transform t in ts)
+            {
+                if (t.gameObject.name == "Checkpoint1")
+                {
+                    Checkpoints.Add(t.gameObject);
+                }
+            }
+
+            foreach (Transform t in ts)
+            {
+                if (t.gameObject.name == "Checkpoint2")
+                {
+                    Checkpoints.Add(t.gameObject);
+                }
+            }
+        }
+    }
+
     public void GenerateTrack()
     {
+        foreach (var trackPiece in TrackPieces)
+        {
+            Destroy(trackPiece);
+        }
     }
 
     //Feed info/obsevations into AI
@@ -247,7 +274,9 @@ public class Car : Agent
 
         if (collision.gameObject.tag == "Checkpoint")
         {
-            UpcomingCheckpoint == 
+            AddReward(1);
+
+            UpcomingCheckpoint = Checkpoints.IndexOf(collision.gameObject);
         }
     }
 }

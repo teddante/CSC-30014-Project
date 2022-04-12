@@ -845,6 +845,10 @@ PrefabInstance:
       propertyPath: TrackPieces.Array.data[13]
       value: 
       objectReference: {fileID: 408557427}
+    - target: {fileID: 3008877256022777460, guid: d7b09581a04f9dd49b03f5f6277fa1ed, type: 3}
+      propertyPath: m_BehaviorType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3008877256022777461, guid: d7b09581a04f9dd49b03f5f6277fa1ed, type: 3}
       propertyPath: m_RayLength
       value: 200
