@@ -14,7 +14,7 @@ public class Car : Agent
     //Track
     public List<GameObject> TrackPieces = new List<GameObject>();
     public List<GameObject> Checkpoints = new List<GameObject>();
-    public int UpcomingCheckpoint;
+    public int CurrentCheckpoint;
 
     //Inputs
     public float Steering;
@@ -42,6 +42,11 @@ public class Car : Agent
     
     private Rigidbody rBody;
     private float ZeroSpeedTimer;
+
+    public GameObject _findCheckpoint1After;
+    public GameObject _findCheckpoint2After;
+    public GameObject _findCheckpoint3After;
+    public GameObject _findCheckpoint4After;
 
     // Start is called before the first frame update
     public override void Initialize()
@@ -160,6 +165,8 @@ public class Car : Agent
 
         FindCheckpointsFromTrackPieces();
 
+        CurrentCheckpoint = -1;
+
         rBody.angularVelocity = Vector3.zero;
         rBody.velocity = Vector3.zero;
 
@@ -214,36 +221,37 @@ public class Car : Agent
         sensor.AddObservation(rBody.velocity);
         sensor.AddObservation(rBody.angularVelocity);
 
-        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 0).transform.position);
-        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 0).transform.rotation);
-        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 1).transform.position);
-        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 1).transform.rotation);
-        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 2).transform.position);
-        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 2).transform.rotation);
-        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 3).transform.position);
-        sensor.AddObservation(FindCheckpointAfter(UpcomingCheckpoint, 3).transform.rotation);
+        _findCheckpoint1After = FindCheckpointAfter(CurrentCheckpoint, 1);
+        sensor.AddObservation(_findCheckpoint1After.transform.position);
+        sensor.AddObservation(_findCheckpoint1After.transform.rotation);
+        _findCheckpoint2After = FindCheckpointAfter(CurrentCheckpoint, 2);
+        sensor.AddObservation(_findCheckpoint2After.transform.position);
+        sensor.AddObservation(_findCheckpoint2After.transform.rotation);
+        _findCheckpoint3After = FindCheckpointAfter(CurrentCheckpoint, 3);
+        sensor.AddObservation(_findCheckpoint3After.transform.position);
+        sensor.AddObservation(_findCheckpoint3After.transform.rotation);
+        _findCheckpoint4After = FindCheckpointAfter(CurrentCheckpoint, 4);
+        sensor.AddObservation(_findCheckpoint4After.transform.position);
+        sensor.AddObservation(_findCheckpoint4After.transform.rotation);
     }
 
-    public GameObject FindCheckpointAfter(int upcomingCheckpoint, int addAmount)
+    public GameObject FindCheckpointAfter(int currCheckpoint, int addAmount)
     {
-        int i = upcomingCheckpoint;
+        int finalIndexInArray = Checkpoints.Count - 1;
 
-        int j = addAmount;
-
-        int k = Checkpoints.Count - 1;
-
-        while (j > 0)
+        while (addAmount > 0)
         {
-            i++;
-            j--;
+            currCheckpoint++;
 
-            if (i == k)
+            if (currCheckpoint > finalIndexInArray)
             {
-                i = 0;
+                currCheckpoint = 0;
             }
+
+            addAmount--;
         }
 
-        return Checkpoints[i];
+        return Checkpoints[currCheckpoint];
     }
 
     //Apply AI inputs and rewards
@@ -254,7 +262,7 @@ public class Car : Agent
         Throttle = Mathf.Clamp(actionBuffers.ContinuousActions[1], 0 ,1);
         Brake = -Mathf.Clamp(actionBuffers.ContinuousActions[1], -1, 0);
 
-        AddReward(0.001f * rBody.velocity.magnitude);
+        //AddReward(0.001f * rBody.velocity.magnitude);
     }
 
     //The Heuristic function allows to manually control the actions of the agent to test it by hand before handing it over the ML AI
@@ -277,11 +285,21 @@ public class Car : Agent
 
     public void OnTriggerEnter(Collider collision)
     {
-        if (collision.gameObject.tag == "Checkpoint")
+        var findCheckpointAfter = FindCheckpointAfter(CurrentCheckpoint, 1);
+        if (collision.gameObject == findCheckpointAfter)
         {
-            AddReward(1);
+            AddReward(1f);
 
-            UpcomingCheckpoint = Checkpoints.IndexOf(collision.gameObject);
+            AddReward(0.1f * rBody.velocity.magnitude);
+
+            CurrentCheckpoint = Checkpoints.IndexOf(collision.gameObject);
+        }
+
+        else
+        {
+            SetReward(-1f);
+
+            EndEpisode();
         }
     }
 }
