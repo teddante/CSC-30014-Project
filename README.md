@@ -135,13 +135,17 @@ Very barebones aerodynamics modelling will take place in the simulation due to t
 
 ### Car Visual 3D Model
 
-I am also going to create a basic visual model of the vehicles body just to represent the volume it takes up in 3D space. I am using Blender to create this model which is exported for use in Unity. It vaguely resembles a simple two-passenger roadster sports car. ![](RackMultipart20220625-1-cc6wv7_html_9829cb01d4131364.png)
+I am also going to create a basic visual model of the vehicles body just to represent the volume it takes up in 3D space. I am using Blender to create this model which is exported for use in Unity. It vaguely resembles a simple two-passenger roadster sports car.
+
+![Picture3](https://user-images.githubusercontent.com/37670093/175773596-36a23969-dfef-472a-9f07-dc2e6bb6784c.png)
 
 _Figure 4 - Screen capture of Unity and the basic car model in the track with checkpoints_
 
 ## Static Track Design
 
-For the first part of the project, I am going to work on the machine learning environment within a static track to keep it simple. The track will be short to allow for quick iteration between laps. It features a few of the classic track features that are usually within your usual racetracks such as hairpins, chicanes, and basic left right turns. Here is an image of the track I&#39;ve created within Unity that I will initially use for testing purposes. ![](RackMultipart20220625-1-cc6wv7_html_fe33706a1b54dcd8.png)
+For the first part of the project, I am going to work on the machine learning environment within a static track to keep it simple. The track will be short to allow for quick iteration between laps. It features a few of the classic track features that are usually within your usual racetracks such as hairpins, chicanes, and basic left right turns. Here is an image of the track I&#39;ve created within Unity that I will initially use for testing purposes.
+
+![Picture2](https://user-images.githubusercontent.com/37670093/175773613-cb654851-814d-4b1f-80e0-a9d184fb833f.png)
 
 _Figure 5 – Static Track Design example_
 
@@ -160,11 +164,53 @@ Our reinforcement learning agent will be trained on three core ideas, observatio
 - The position and rotation of the next four upcoming checkpoint – The agent will use this to determine its position and rotation relative to the upcoming checkpoints, it can use this information to prepare for the next few corners and get into the right position for them to reach the highest possible safe speed for the corners.
 - Sixteen depth sensors around the car – These are sixteen sensors that measure the distance of objects around the car, these will be used to detect nearby object that the car will hopefully avoid a collision.
 
-This is a total of forty-one floats that are being observed by the agent. Below is the function for colling the observations for the agent: ![](RackMultipart20220625-1-cc6wv7_html_a2356b3e8a8ff14b.gif)
+This is a total of forty-one floats that are being observed by the agent. Below is the function for colling the observations for the agent:
+
+    public override void CollectObservations(VectorSensor sensor)
+    {
+        sensor.AddObservation(transform.position);
+        sensor.AddObservation(transform.rotation);
+    
+        sensor.AddObservation(rBody.velocity);
+        sensor.AddObservation(rBody.angularVelocity);
+    
+        _findCheckpoint1After = FindCheckpointAfter(CurrentCheckpoint, 1);
+        sensor.AddObservation(_findCheckpoint1After.transform.position);
+        sensor.AddObservation(_findCheckpoint1After.transform.rotation);
+        _findCheckpoint2After = FindCheckpointAfter(CurrentCheckpoint, 2);
+        sensor.AddObservation(_findCheckpoint2After.transform.position);
+        sensor.AddObservation(_findCheckpoint2After.transform.rotation);
+        _findCheckpoint3After = FindCheckpointAfter(CurrentCheckpoint, 3);
+        sensor.AddObservation(_findCheckpoint3After.transform.position);
+        sensor.AddObservation(_findCheckpoint3After.transform.rotation);
+        _findCheckpoint4After = FindCheckpointAfter(CurrentCheckpoint, 4);
+        sensor.AddObservation(_findCheckpoint4After.transform.position);
+        sensor.AddObservation(_findCheckpoint4After.transform.rotation);
+    }
 
 _Figure 6 - Code for collecting observations_
 
-The function above includes a function called &#39;FindCheckpointAfter&#39; which is used to loop around the array of checkpoints to find the next checkpoint and several after which can be specified with the second parameter of the function. The function is described below: ![](RackMultipart20220625-1-cc6wv7_html_313671524773639f.gif)
+The function above includes a function called &#39;FindCheckpointAfter&#39; which is used to loop around the array of checkpoints to find the next checkpoint and several after which can be specified with the second parameter of the function. The function is described below:
+
+
+    public GameObject FindCheckpointAfter(int currCheckpoint, int addAmount)
+    {
+        int finalIndexInArray = Checkpoints.Count - 1;
+    
+        while (addAmount > 0)
+        {
+            currCheckpoint++;
+    
+            if (currCheckpoint > finalIndexInArray)
+            {
+                currCheckpoint = 0;
+            }
+    
+            addAmount--;
+        }
+    
+        return Checkpoints[currCheckpoint];
+    }
 
 _Figure 7 – Algorithm for the looping through the array of checkpoints to find the next checkpoint, notice it allows for looping around to the start_
 
@@ -176,7 +222,10 @@ The agent makes decisions at set intervals within the simulation. I have control
 
 This is the stage the decisions of the network are made to actions. Actions within the framework can be only continuous or discrete. We will be using two continuous values for the simulation, and these will represent the steering and the throttle/brake of the car. Below is the algorithm for the mapping of the actions and clamping them for use as the car&#39;s inputs:
 
-![](RackMultipart20220625-1-cc6wv7_html_5b478d101daedf22.gif)
+    Steering = Mathf.Clamp(actionBuffers.ContinuousActions[0], -1, 1);
+    
+    Throttle = Mathf.Clamp(actionBuffers.ContinuousActions[1], 0 ,1);
+    Brake = -Mathf.Clamp(actionBuffers.ContinuousActions[1], -1, 0);
 
 _Figure 8 - Mapping of the actions and clamping them for use as the car&#39;s inputs_
 
@@ -186,15 +235,57 @@ The reward function of this project was incredibly hard to calculate to get the 
 
 - Giving a reward when crossing the correct upcoming checkpoint of the track – This was used to give the agent an idea of the tracks orientation and a goal to work towards.
 - Giving a reward for the speed as it crossed a checkpoint – This reward is scaled with the magnitude of the velocity vector; this was done with the hope of increasing the velocity of the agent and press the agent to find the optimum line around the track to maximize speed.
-- Punishment for hitting a wall – This is to prevent collision with the walls, also the episode is ended when a wall is hit. ![](RackMultipart20220625-1-cc6wv7_html_a6e609bcf8abcb28.gif)
+- Punishment for hitting a wall – This is to prevent collision with the walls, also the episode is ended when a wall is hit. 
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.name == "Wall")
+        {
+            SetReward(-1f);
+    
+            EndEpisode();
+        }
+    }
 
 _Figure 9 – Algorithm for colliding with a wall and its punishment and ending of the episode_
 
-- Punishment for hitting the wrong checkpoint – This will prevent the agent from back tracking into a prior checkpoint and losing itself on the track, hopefully pressuring the agent to keep in the right flow of the track. ![](RackMultipart20220625-1-cc6wv7_html_be23b939f75e1eea.gif)
+- Punishment for hitting the wrong checkpoint – This will prevent the agent from back tracking into a prior checkpoint and losing itself on the track, hopefully pressuring the agent to keep in the right flow of the track.
+
+    public void OnTriggerEnter(Collider collision)
+    {
+        var findCheckpointAfter = FindCheckpointAfter(CurrentCheckpoint, 1);
+        if (collision.gameObject == findCheckpointAfter)
+        {
+            AddReward(1f);
+    
+            AddReward(0.1f * rBody.velocity.magnitude);
+    
+            CurrentCheckpoint = Checkpoints.IndexOf(collision.gameObject);
+        }
+    
+        else
+        {
+            SetReward(-1f);
+    
+            EndEpisode();
+        }
+    }
 
 _Figure 10 - Algorithm for hitting a checkpoint and checking if its the right checkpoint_
 
-- Punishment for coming to a standstill – This prevents the agent from coming to a standstill and allowing an episode to play out for a large number of steps with no progress. This also resets the episode. See figure 8. ![](RackMultipart20220625-1-cc6wv7_html_a4dbc5f0fa21b1be.gif)
+- Punishment for coming to a standstill – This prevents the agent from coming to a standstill and allowing an episode to play out for a large number of steps with no progress. This also resets the episode. See figure 8.
+
+    if (rBody.velocity.magnitude < 1)
+    {
+        ZeroSpeedTimer -= Time.fixedDeltaTime;
+    }
+    
+    if (ZeroSpeedTimer <= 0)
+    {
+        SetReward(-1f);
+    
+        EndEpisode();
+    }
 
 _Figure 11 - Checking for a standstill, called every academy step_
 
