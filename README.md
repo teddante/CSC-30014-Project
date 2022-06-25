@@ -165,53 +165,53 @@ Our reinforcement learning agent will be trained on three core ideas, observatio
 - Sixteen depth sensors around the car – These are sixteen sensors that measure the distance of objects around the car, these will be used to detect nearby object that the car will hopefully avoid a collision.
 
 This is a total of forty-one floats that are being observed by the agent. Below is the function for colling the observations for the agent:
+```
+public override void CollectObservations(VectorSensor sensor)
+{
+    sensor.AddObservation(transform.position);
+    sensor.AddObservation(transform.rotation);
 
-    public override void CollectObservations(VectorSensor sensor)
-    {
-        sensor.AddObservation(transform.position);
-        sensor.AddObservation(transform.rotation);
-    
-        sensor.AddObservation(rBody.velocity);
-        sensor.AddObservation(rBody.angularVelocity);
-    
-        _findCheckpoint1After = FindCheckpointAfter(CurrentCheckpoint, 1);
-        sensor.AddObservation(_findCheckpoint1After.transform.position);
-        sensor.AddObservation(_findCheckpoint1After.transform.rotation);
-        _findCheckpoint2After = FindCheckpointAfter(CurrentCheckpoint, 2);
-        sensor.AddObservation(_findCheckpoint2After.transform.position);
-        sensor.AddObservation(_findCheckpoint2After.transform.rotation);
-        _findCheckpoint3After = FindCheckpointAfter(CurrentCheckpoint, 3);
-        sensor.AddObservation(_findCheckpoint3After.transform.position);
-        sensor.AddObservation(_findCheckpoint3After.transform.rotation);
-        _findCheckpoint4After = FindCheckpointAfter(CurrentCheckpoint, 4);
-        sensor.AddObservation(_findCheckpoint4After.transform.position);
-        sensor.AddObservation(_findCheckpoint4After.transform.rotation);
-    }
+    sensor.AddObservation(rBody.velocity);
+    sensor.AddObservation(rBody.angularVelocity);
 
+    _findCheckpoint1After = FindCheckpointAfter(CurrentCheckpoint, 1);
+    sensor.AddObservation(_findCheckpoint1After.transform.position);
+    sensor.AddObservation(_findCheckpoint1After.transform.rotation);
+    _findCheckpoint2After = FindCheckpointAfter(CurrentCheckpoint, 2);
+    sensor.AddObservation(_findCheckpoint2After.transform.position);
+    sensor.AddObservation(_findCheckpoint2After.transform.rotation);
+    _findCheckpoint3After = FindCheckpointAfter(CurrentCheckpoint, 3);
+    sensor.AddObservation(_findCheckpoint3After.transform.position);
+    sensor.AddObservation(_findCheckpoint3After.transform.rotation);
+    _findCheckpoint4After = FindCheckpointAfter(CurrentCheckpoint, 4);
+    sensor.AddObservation(_findCheckpoint4After.transform.position);
+    sensor.AddObservation(_findCheckpoint4After.transform.rotation);
+}
+```
 _Figure 6 - Code for collecting observations_
 
 The function above includes a function called &#39;FindCheckpointAfter&#39; which is used to loop around the array of checkpoints to find the next checkpoint and several after which can be specified with the second parameter of the function. The function is described below:
 
+```
+public GameObject FindCheckpointAfter(int currCheckpoint, int addAmount)
+{
+    int finalIndexInArray = Checkpoints.Count - 1;
 
-    public GameObject FindCheckpointAfter(int currCheckpoint, int addAmount)
+    while (addAmount > 0)
     {
-        int finalIndexInArray = Checkpoints.Count - 1;
-    
-        while (addAmount > 0)
+        currCheckpoint++;
+
+        if (currCheckpoint > finalIndexInArray)
         {
-            currCheckpoint++;
-    
-            if (currCheckpoint > finalIndexInArray)
-            {
-                currCheckpoint = 0;
-            }
-    
-            addAmount--;
+            currCheckpoint = 0;
         }
-    
-        return Checkpoints[currCheckpoint];
+
+        addAmount--;
     }
 
+    return Checkpoints[currCheckpoint];
+}
+```
 _Figure 7 – Algorithm for the looping through the array of checkpoints to find the next checkpoint, notice it allows for looping around to the start_
 
 ### Decisions
@@ -221,12 +221,12 @@ The agent makes decisions at set intervals within the simulation. I have control
 ### Actions
 
 This is the stage the decisions of the network are made to actions. Actions within the framework can be only continuous or discrete. We will be using two continuous values for the simulation, and these will represent the steering and the throttle/brake of the car. Below is the algorithm for the mapping of the actions and clamping them for use as the car&#39;s inputs:
+```
+Steering = Mathf.Clamp(actionBuffers.ContinuousActions[0], -1, 1);
 
-    Steering = Mathf.Clamp(actionBuffers.ContinuousActions[0], -1, 1);
-    
-    Throttle = Mathf.Clamp(actionBuffers.ContinuousActions[1], 0 ,1);
-    Brake = -Mathf.Clamp(actionBuffers.ContinuousActions[1], -1, 0);
-
+Throttle = Mathf.Clamp(actionBuffers.ContinuousActions[1], 0 ,1);
+Brake = -Mathf.Clamp(actionBuffers.ContinuousActions[1], -1, 0);
+```
 _Figure 8 - Mapping of the actions and clamping them for use as the car&#39;s inputs_
 
 ### Rewards
@@ -252,41 +252,41 @@ _Figure 9 – Algorithm for colliding with a wall and its punishment and ending 
 
 - Punishment for hitting the wrong checkpoint – This will prevent the agent from back tracking into a prior checkpoint and losing itself on the track, hopefully pressuring the agent to keep in the right flow of the track.
 ```
-    public void OnTriggerEnter(Collider collision)
+public void OnTriggerEnter(Collider collision)
+{
+    var findCheckpointAfter = FindCheckpointAfter(CurrentCheckpoint, 1);
+    if (collision.gameObject == findCheckpointAfter)
     {
-        var findCheckpointAfter = FindCheckpointAfter(CurrentCheckpoint, 1);
-        if (collision.gameObject == findCheckpointAfter)
-        {
-            AddReward(1f);
-    
-            AddReward(0.1f * rBody.velocity.magnitude);
-    
-            CurrentCheckpoint = Checkpoints.IndexOf(collision.gameObject);
-        }
-    
-        else
-        {
-            SetReward(-1f);
-    
-            EndEpisode();
-        }
+        AddReward(1f);
+
+        AddReward(0.1f * rBody.velocity.magnitude);
+
+        CurrentCheckpoint = Checkpoints.IndexOf(collision.gameObject);
     }
+
+    else
+    {
+        SetReward(-1f);
+
+        EndEpisode();
+    }
+}
 ```
 _Figure 10 - Algorithm for hitting a checkpoint and checking if its the right checkpoint_
 
 - Punishment for coming to a standstill – This prevents the agent from coming to a standstill and allowing an episode to play out for a large number of steps with no progress. This also resets the episode. See figure 8. 
 ```
-    if (rBody.velocity.magnitude < 1)
-    {
-        ZeroSpeedTimer -= Time.fixedDeltaTime;
-    }
-    
-    if (ZeroSpeedTimer <= 0)
-    {
-        SetReward(-1f);
-    
-        EndEpisode();
-    }
+if (rBody.velocity.magnitude < 1)
+{
+    ZeroSpeedTimer -= Time.fixedDeltaTime;
+}
+
+if (ZeroSpeedTimer <= 0)
+{
+    SetReward(-1f);
+
+    EndEpisode();
+}
 ```
 _Figure 11 - Checking for a standstill, called every academy step_
 
