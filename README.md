@@ -275,6 +275,7 @@ public void OnTriggerEnter(Collider collision)
 _Figure 10 - Algorithm for hitting a checkpoint and checking if its the right checkpoint_
 
 - Punishment for coming to a standstill – This prevents the agent from coming to a standstill and allowing an episode to play out for a large number of steps with no progress. This also resets the episode. See figure 8. 
+
 ```
 if (rBody.velocity.magnitude < 1)
 {
@@ -288,31 +289,83 @@ if (ZeroSpeedTimer <= 0)
     EndEpisode();
 }
 ```
+
 _Figure 11 - Checking for a standstill, called every academy step_
 
 ## Environment
 
-The track environment mentioned earlier is used for each episode. When episode begins where the agent is trained, all the checkpoints from the track pieces are quickly thrown into an array to save time. Also, the car is reset to its starting position and direction while is velocity and angular velocity are reset to zero. ![](RackMultipart20220625-1-cc6wv7_html_c30ef9e9d7465aca.gif)
+The track environment mentioned earlier is used for each episode. When episode begins where the agent is trained, all the checkpoints from the track pieces are quickly thrown into an array to save time. Also, the car is reset to its starting position and direction while is velocity and angular velocity are reset to zero.
+
+```
+public override void OnEpisodeBegin()
+{
+    //GenerateTrack();
+
+    FindCheckpointsFromTrackPieces();
+
+    CurrentCheckpoint = -1;
+
+    rBody.angularVelocity = Vector3.zero;
+    rBody.velocity = Vector3.zero;
+
+    transform.localPosition = new Vector3(0, 0.6f, 0); //Height of car from top to bottom of tyre with fully extended suspension
+    transform.localEulerAngles = Vector3.zero;
+
+    ZeroSpeedTimer = 2;
+}
+```
 
 _Figure 12 - Algorithm used at the start of each episode_
 
-Here below is the code for finding all of the checkpoints within the track pieces: ![](RackMultipart20220625-1-cc6wv7_html_3a100f26800a2e68.gif)
+Here below is the code for finding all of the checkpoints within the track pieces:
+
+```
+public void FindCheckpointsFromTrackPieces()
+{
+    Checkpoints.Clear();
+
+    foreach (var trackPiece in TrackPieces)
+    {
+        var allKids = GetComponentsInChildren<Transform>();
+
+        Transform[] ts = trackPiece.transform.GetComponentsInChildren<Transform>();
+
+        foreach (Transform t in ts)
+        {
+            if (t.gameObject.name == "Checkpoint1")
+            {
+                Checkpoints.Add(t.gameObject);
+            }
+        }
+
+        foreach (Transform t in ts)
+        {
+            if (t.gameObject.name == "Checkpoint2")
+            {
+                Checkpoints.Add(t.gameObject);
+            }
+        }
+    }
+}
+```
 
 _Figure 13 - Algorithm used to find all the checkpoints within the track_
 
-Evaluation
+# Evaluation
 
-This project was a lot more challenging and complex than I initially thought when I proposed it. This was proved when I went through numerous steps to correct the reward function and the observations trying to get the agent to get around the track correctly. What occurred was that the agent attempted for execute the first turn as fast as possible, I assumed this would have been since a lot of the reward function was based on the speed of the agent. This meant I went back though to edit the reward function to take out the involvement with velocity and to only reward based on progressing through the checkpoint. However, this meant the agent struggled to pull away from a stand still so velocity had to be reimplemented. ![](RackMultipart20220625-1-cc6wv7_html_4c71a76b634555a0.png)
+This project was a lot more challenging and complex than I initially thought when I proposed it. This was proved when I went through numerous steps to correct the reward function and the observations trying to get the agent to get around the track correctly. What occurred was that the agent attempted for execute the first turn as fast as possible, I assumed this would have been since a lot of the reward function was based on the speed of the agent. This meant I went back though to edit the reward function to take out the involvement with velocity and to only reward based on progressing through the checkpoint. However, this meant the agent struggled to pull away from a stand still so velocity had to be reimplemented.
+
+![Picture4](https://user-images.githubusercontent.com/37670093/175774418-00d30b49-229a-49bb-af2f-5b2ae5b050af.png)
 
 _Figure 14 - Tensor Board of the result_
 
 Above is the Tensor Board of the final test that I left to run for 1.4 million steps. This took several hours, and the outcome was an agent that could execute 1 corner incredibly fast, before either colliding with the wall or coming to a standstill where the anti-standstill code kicked in. As you can see the cumulative reward tapered off where it slowly reaches what it thinks is the right outcome.
 
-Conclusion
+# Conclusion
 
 The project turned out to be a failure. The program went thorough numerous iterations to hopefully push the agent on track around the track towards the goal of finding the optimum racing line around a track. This occurred because I did not recognize the size and scale of a project like this and it being incredibly complex.
 
-References
+# References
 
 Auckley, J., Horenstein, M., Esber, Z., &amp; Donohue, J. (2019, July 26). _Genetic Programming for Racing Line Optimization- Part 1 | by Joe Auckley | Adventures in Autonomous Vehicles_. Retrieved from Medium: https://medium.com/adventures-in-autonomous-vehicles/genetic-programming-for-racing-line-optimization-part-1-e563c606e502
 
@@ -354,7 +407,7 @@ Xiong, Y. (2010, July 30). _Racing Line Optimization_. Retrieved from https://ds
 
 Zal, P. (n.d.). _Horsepower and Torque curve for 1998 Mazda MX-5 1.6 (man. 5) offered since April 1998 for Europe_. Retrieved from Automobile Catalog: https://www.automobile-catalog.com/curve/1998/1667015/mazda\_mx-5\_1\_6.html
 
-Appendix
+# Appendix
 
 Source code:
 
