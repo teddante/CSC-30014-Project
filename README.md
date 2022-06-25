@@ -236,21 +236,22 @@ The reward function of this project was incredibly hard to calculate to get the 
 - Giving a reward when crossing the correct upcoming checkpoint of the track – This was used to give the agent an idea of the tracks orientation and a goal to work towards.
 - Giving a reward for the speed as it crossed a checkpoint – This reward is scaled with the magnitude of the velocity vector; this was done with the hope of increasing the velocity of the agent and press the agent to find the optimum line around the track to maximize speed.
 - Punishment for hitting a wall – This is to prevent collision with the walls, also the episode is ended when a wall is hit. 
-
-    public void OnCollisionEnter(Collision collision)
+```
+public void OnCollisionEnter(Collision collision)
+{
+    if (collision.gameObject.name == "Wall")
     {
-        if (collision.gameObject.name == "Wall")
-        {
-            SetReward(-1f);
-    
-            EndEpisode();
-        }
+        SetReward(-1f);
+
+        EndEpisode();
     }
+}
+```
 
 _Figure 9 – Algorithm for colliding with a wall and its punishment and ending of the episode_
 
 - Punishment for hitting the wrong checkpoint – This will prevent the agent from back tracking into a prior checkpoint and losing itself on the track, hopefully pressuring the agent to keep in the right flow of the track.
-
+```
     public void OnTriggerEnter(Collider collision)
     {
         var findCheckpointAfter = FindCheckpointAfter(CurrentCheckpoint, 1);
@@ -270,11 +271,11 @@ _Figure 9 – Algorithm for colliding with a wall and its punishment and ending 
             EndEpisode();
         }
     }
-
+```
 _Figure 10 - Algorithm for hitting a checkpoint and checking if its the right checkpoint_
 
-- Punishment for coming to a standstill – This prevents the agent from coming to a standstill and allowing an episode to play out for a large number of steps with no progress. This also resets the episode. See figure 8.
-
+- Punishment for coming to a standstill – This prevents the agent from coming to a standstill and allowing an episode to play out for a large number of steps with no progress. This also resets the episode. See figure 8. 
+```
     if (rBody.velocity.magnitude < 1)
     {
         ZeroSpeedTimer -= Time.fixedDeltaTime;
@@ -286,7 +287,7 @@ _Figure 10 - Algorithm for hitting a checkpoint and checking if its the right ch
     
         EndEpisode();
     }
-
+```
 _Figure 11 - Checking for a standstill, called every academy step_
 
 ## Environment
